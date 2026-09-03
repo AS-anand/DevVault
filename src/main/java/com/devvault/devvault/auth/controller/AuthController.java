@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.devvault.devvault.auth.dto.LoginRequest;
+import com.devvault.devvault.auth.dto.AuthResponse;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -20,7 +22,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<SuccessResponse> register(
-            @RequestBody RegisterRequest request
+            @Valid @RequestBody RegisterRequest request
     ) {
         authService.register(request);
 
@@ -33,16 +35,13 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<SuccessResponse> login(
-            @RequestBody LoginRequest request
+    public ResponseEntity<AuthResponse> login(
+            @Valid @RequestBody LoginRequest request
     ) {
-        authService.login(request);
+        String token = authService.login(request);
 
-        return ResponseEntity.ok(
-                new SuccessResponse(
-                        HttpStatus.OK.value(),
-                        "Login successful"
-                )
-        );
+        return ResponseEntity.ok(new AuthResponse(token));
     }
+
+
 }
