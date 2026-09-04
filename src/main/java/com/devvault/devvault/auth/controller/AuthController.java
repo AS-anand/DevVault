@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.devvault.devvault.auth.dto.LoginRequest;
 import com.devvault.devvault.auth.dto.AuthResponse;
 import jakarta.validation.Valid;
+import com.devvault.devvault.auth.dto.RefreshTokenRequest;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -38,9 +39,19 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(
             @Valid @RequestBody LoginRequest request
     ) {
-        String token = authService.login(request);
+        AuthResponse response = authService.login(request);
 
-        return ResponseEntity.ok(new AuthResponse(token));
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(
+            @Valid @RequestBody RefreshTokenRequest request
+    ) {
+        AuthResponse response =
+                authService.refreshToken(request.getRefreshToken());
+
+        return ResponseEntity.ok(response);
     }
 
 
