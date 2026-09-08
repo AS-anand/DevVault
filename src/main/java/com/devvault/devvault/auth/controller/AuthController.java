@@ -10,6 +10,7 @@ import com.devvault.devvault.auth.dto.LoginRequest;
 import com.devvault.devvault.auth.dto.AuthResponse;
 import jakarta.validation.Valid;
 import com.devvault.devvault.auth.dto.RefreshTokenRequest;
+import com.devvault.devvault.auth.dto.LogoutRequest;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -52,6 +53,26 @@ public class AuthController {
                 authService.refreshToken(request.getRefreshToken());
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<SuccessResponse> logout(
+            @RequestHeader("Authorization") String authHeader,
+            @Valid @RequestBody LogoutRequest request
+    ) {
+        String accessToken = authHeader.substring(7);
+
+        authService.logout(
+                accessToken,
+                request.getRefreshToken()
+        );
+
+        return ResponseEntity.ok(
+                new SuccessResponse(
+                        HttpStatus.OK.value(),
+                        "Logged out successfully"
+                )
+        );
     }
 
 

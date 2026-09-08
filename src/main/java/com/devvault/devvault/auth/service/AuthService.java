@@ -18,18 +18,21 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+    private final TokenRevocationService tokenRevocationService;
 
 
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
-            RefreshTokenService refreshTokenService
+            RefreshTokenService refreshTokenService,
+            TokenRevocationService tokenRevocationService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
+        this.tokenRevocationService = tokenRevocationService;
     }
 
     public void register(RegisterRequest request) {
@@ -93,5 +96,23 @@ public class AuthService {
         refreshTokenService.storeRefreshToken(newRefreshToken, user.getId());
 
         return new AuthResponse(newAccessToken, newRefreshToken);
+    }
+
+    public void logout(String accessToken, String refreshToken) {
+
+        refreshTokenService.deleteRefreshToken(refreshToken);
+
+        String tokenId = jwtService.extractTokenId(accessToken);
+
+        long remainingTime =
+                jwtService.extractExpiration(accessToken).getTime()
+                        - System.currentTimeMillis();
+
+        if (remainingTime > 0) {
+            tokenRevocationService.revokeToken(
+                    tokenId,
+                    remainingTime
+            );
+        }
     }
 }
