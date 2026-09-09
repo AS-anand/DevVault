@@ -11,6 +11,9 @@ import com.devvault.devvault.auth.dto.AuthResponse;
 import jakarta.validation.Valid;
 import com.devvault.devvault.auth.dto.RefreshTokenRequest;
 import com.devvault.devvault.auth.dto.LogoutRequest;
+import com.devvault.devvault.auth.dto.ForgotPasswordRequest;
+import com.devvault.devvault.auth.dto.ResetPasswordRequest;
+
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -71,6 +74,37 @@ public class AuthController {
                 new SuccessResponse(
                         HttpStatus.OK.value(),
                         "Logged out successfully"
+                )
+        );
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<SuccessResponse> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request
+    ) {
+        authService.forgotPassword(request.getEmail());
+
+        return ResponseEntity.ok(
+                new SuccessResponse(
+                        HttpStatus.OK.value(),
+                        "If an account exists with this email, a password reset link has been sent"
+                )
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<SuccessResponse> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request
+    ) {
+        authService.resetPassword(
+                request.getToken(),
+                request.getNewPassword()
+        );
+
+        return ResponseEntity.ok(
+                new SuccessResponse(
+                        HttpStatus.OK.value(),
+                        "Password reset successfully"
                 )
         );
     }

@@ -19,6 +19,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final TokenRevocationService tokenRevocationService;
+    private final PasswordResetTokenService passwordResetTokenService;
 
 
     public AuthService(
@@ -26,13 +27,15 @@ public class AuthService {
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
             RefreshTokenService refreshTokenService,
-            TokenRevocationService tokenRevocationService
+            TokenRevocationService tokenRevocationService,
+            PasswordResetTokenService passwordResetTokenService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
         this.tokenRevocationService = tokenRevocationService;
+        this.passwordResetTokenService = passwordResetTokenService;
     }
 
     public void register(RegisterRequest request) {
@@ -114,5 +117,55 @@ public class AuthService {
                     remainingTime
             );
         }
+    }
+
+    public String forgotPassword(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElse(null);
+
+        if (user == null) {
+            return null;
+        }
+
+        String resetToken =
+                passwordResetTokenService.generatePasswordResetToken();
+
+        passwordResetTokenService.storePasswordResetToken(
+                resetToken,
+                user.getId()
+        );
+
+        System.out.println("Password reset token: " + resetToken);
+
+        return resetToken;
+    }
+
+    public void resetPassword(
+            String token,
+            String newPassword
+    ) {
+        Long userId = passwordResetTokenService.getUserId(token);
+
+        if (userId == null) {
+            throw new InvalidCredentialsException(
+                    "Invalid or expired password reset token"
+            );
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new InvalidCredentialsException(
+                                "Invalid or expired password reset token"
+                        )
+                );
+
+        user.setPassword(
+                passwordEncoder.encode(newPassword)
+        );
+
+        userRepository.save(user);
+
+        passwordResetTokenService.deletePasswordResetToken(token);
     }
 }
