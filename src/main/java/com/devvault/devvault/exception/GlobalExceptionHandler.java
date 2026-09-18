@@ -5,6 +5,7 @@ import com.devvault.devvault.auth.exception.EmailAlreadyExistsException;
 import com.devvault.devvault.auth.exception.InvalidCredentialsException;
 import com.devvault.devvault.auth.exception.UsernameAlreadyExistsException;
 import com.devvault.devvault.exception.dto.ErrorResponse;
+import com.devvault.devvault.user.exception.InvalidCurrentPasswordException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -79,6 +80,18 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(
                         HttpStatus.BAD_REQUEST.value(),
                         errors
+                ));
+    }
+
+    @ExceptionHandler(InvalidCurrentPasswordException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCurrentPassword(
+            InvalidCurrentPasswordException ex
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(
+                        HttpStatus.BAD_REQUEST.value(),
+                        ex.getMessage()
                 ));
     }
 }
