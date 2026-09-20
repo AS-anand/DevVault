@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import com.devvault.devvault.user.exception.UserNotFoundException;
+import com.devvault.devvault.vault.exception.VaultAccessDeniedException;
+import com.devvault.devvault.vault.exception.VaultNotFoundException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -91,6 +94,42 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(
                         HttpStatus.BAD_REQUEST.value(),
+                        ex.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(
+            UserNotFoundException ex
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(
+                        HttpStatus.NOT_FOUND.value(),
+                        ex.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(VaultNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleVaultNotFound(
+            VaultNotFoundException ex
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(
+                        HttpStatus.NOT_FOUND.value(),
+                        ex.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(VaultAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleVaultAccessDenied(
+            VaultAccessDeniedException ex
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(
+                        HttpStatus.FORBIDDEN.value(),
                         ex.getMessage()
                 ));
     }
