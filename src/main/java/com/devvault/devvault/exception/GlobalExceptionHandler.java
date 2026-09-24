@@ -16,6 +16,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import com.devvault.devvault.user.exception.UserNotFoundException;
 import com.devvault.devvault.vault.exception.VaultAccessDeniedException;
 import com.devvault.devvault.vault.exception.VaultNotFoundException;
+import com.devvault.devvault.secret.exception.SecretNotFoundException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -130,6 +131,18 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(
                         HttpStatus.FORBIDDEN.value(),
+                        ex.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(SecretNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSecretNotFound(
+            SecretNotFoundException ex
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(
+                        HttpStatus.NOT_FOUND.value(),
                         ex.getMessage()
                 ));
     }
