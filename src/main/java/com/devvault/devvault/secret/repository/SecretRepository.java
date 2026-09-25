@@ -11,4 +11,6 @@ public interface SecretRepository extends JpaRepository<Secret, Long> {
     Optional<Secret> findByIdAndVaultId(Long secretId, Long vaultId);
 
     List<Secret> findAllByVaultId(Long vaultId);
+
+    List<Secret> findAllByFolderId(Long folderId);
 }

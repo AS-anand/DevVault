@@ -1,27 +1,20 @@
-package com.devvault.devvault.secret.entity;
+package com.devvault.devvault.folder.entity;
 
-import com.devvault.devvault.folder.entity.Folder;
 import com.devvault.devvault.vault.entity.Vault;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "secrets")
-public class Secret {
+@Table(name = "folders")
+public class Folder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
-
-    private String type;
-
-    private String username;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String encryptedValue;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "vault_id", nullable = false)
@@ -42,28 +35,12 @@ public class Secret {
         updatedAt = LocalDateTime.now();
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "folder_id")
-    private Folder folder;
-
     public Long getId() {
         return id;
     }
 
     public String getName() {
         return name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEncryptedValue() {
-        return encryptedValue;
     }
 
     public Vault getVault() {
@@ -82,27 +59,7 @@ public class Secret {
         this.name = name;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setEncryptedValue(String encryptedValue) {
-        this.encryptedValue = encryptedValue;
-    }
-
     public void setVault(Vault vault) {
         this.vault = vault;
-    }
-
-    public Folder getFolder() {
-        return folder;
-    }
-
-    public void setFolder(Folder folder) {
-        this.folder = folder;
     }
 }
